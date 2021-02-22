@@ -1,25 +1,63 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {
+  RecoilRoot,
+  atom,
+  selector,
+  useRecoilState,
+  useRecoilValue
+} from 'recoil';
+
+const textState = atom({
+  key: 'textState',
+  default: ''
+});
+
+function TextInput() {
+  const [text, setText] = useRecoilState(textState);
+  const textChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.preventDefault();
+    setText(event.target.value);
+  };
+
+  return (
+    <div>
+      <input type="text" value={text} onChange={textChange} />
+      <p>
+        Echo: {text}
+      </p>
+    </div>
+  );
+}
+
+const charCountState = selector({
+  key: 'charCountState',
+  get: ({ get }) => {
+    const text = get(textState);
+
+    return text.length;
+  }
+});
+
+function CharacterCount() {
+  const count = useRecoilValue(charCountState);
+
+  return <p>Character Count: {count}</p>;
+}
+
+function CharacterCounter() {
+  return (
+    <div>
+      <TextInput />
+      <CharacterCount />
+    </div>
+  );
+}
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <RecoilRoot>
+      <CharacterCounter />
+    </RecoilRoot>
   );
 }
 
